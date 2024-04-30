@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Data Visualization</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+</head>
+
+<body>
+    <h1>Real-time Step Detection and Velocity Calculation</h1>
+    <canvas id="dataChart"></canvas>
+    <script>
+        var ctx = document.getElementById('dataChart').getContext('2d');
+        var dataChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Velocity (m/s)',
+                    backgroundColor: 'rgb(255, 99, 132)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    data: []
+                }, {
+                    label: 'Steps',
+                    backgroundColor: 'rgb(54, 162, 235)',
+                    borderColor: 'rgb(54, 162, 235)',
+                    data: []
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        var socket = io();
+        socket.on('data', function (data) {
+            dataChart.data.labels.push(new Date().toLocaleTimeString());
+            dataChart.data.datasets[0].data.push(data.velocity);
+            dataChart.data.datasets[1].data.push(data.steps);
+            dataChart.update();
+        });
+    </script>
+</body>
+
+</html>
